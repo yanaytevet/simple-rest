@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic, Optional, Any, Dict
 
-from common.type_hints import JSONType
+from .common.type_hints import JSONType
 
 T = TypeVar('T')
 

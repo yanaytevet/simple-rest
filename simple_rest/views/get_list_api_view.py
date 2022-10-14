@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Type, List
+from typing import Type
 
-from django.contrib.auth import get_user
-from django.contrib.auth.models import User
 from django.db.models import Model, QuerySet
 from django.http import HttpRequest, JsonResponse
 
@@ -44,8 +42,8 @@ class GetListAPIView(APIViewComponent, ABC):
         return objects.order_by('id')
 
     @classmethod
-    def serialize_all_objects(cls, request: APIRequest, query_set: QuerySet, **kwargs) -> List[JSONType]:
-        res: List[JSONType] = []
+    def serialize_all_objects(cls, request: APIRequest, query_set: QuerySet, **kwargs) -> list[JSONType]:
+        res: list[JSONType] = []
         for obj in query_set:
             res.append(cls.serialize_object(request, obj, **kwargs))
         res = [obj for obj in res if obj is not None]
