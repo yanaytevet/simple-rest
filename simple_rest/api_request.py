@@ -4,7 +4,7 @@ from typing import Optional
 from django.contrib.auth import get_user
 from django.contrib.auth.models import User
 from django.contrib.sessions.backends.base import SessionBase
-from django.http import HttpRequest
+from django.http import HttpRequest, QueryDict
 
 
 class APIRequest:
@@ -12,7 +12,7 @@ class APIRequest:
         self.original_request = original_request
         self.user: Optional[User] = None
         self.data = json.loads(original_request.body) if original_request.body else {}
-        self.query_params = original_request.GET
+        self.query_params: QueryDict = original_request.GET
         self.files = original_request.FILES
         self.init_user()
 

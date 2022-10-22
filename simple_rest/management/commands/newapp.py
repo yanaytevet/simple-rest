@@ -18,7 +18,7 @@ ModelRegisterer(models).register()
 from django.urls import path
 
 urlpatterns = [
-#    path(r"", SampleView.as_view(), name="sample"),
+#    path(r'', SampleView.as_view(), name='sample'),
 ]
     """
 
@@ -34,6 +34,7 @@ urlpatterns = [
         self.create_models_directory_for_app(app_name)
         self.create_other_directories_for_app(app_name)
         self.change_admin_file(app_name)
+        self.add_to_settings(app_name)
 
     def create_app(self, app_name: str) -> None:
         call_command('startapp', app_name)
@@ -44,9 +45,12 @@ urlpatterns = [
         project_url_path = self.get_project_url_path()
         content = self.get_file_content(project_url_path)
         app_url = app_name.replace('_', '-')
-        url_file_line = f"path(r'{app_url}/', include('{app_name}.urls')),"
+        url_file_line = f"path(r'/api/{app_url}/', include('{app_name}.urls')),"
         content = content.replace(']', f'    {url_file_line}\n]')
         self.override_file_content(project_url_path, content)
+
+    def add_to_settings(self, app_name):
+        pass
 
     def get_project_url_path(self) -> str:
         return settings.ROOT_URLCONF.replace('.', '/') + '.py'

@@ -6,6 +6,14 @@ from django.db.models import ManyToOneRel, ManyToManyField, ManyToManyRel, Model
 
 
 class ModelRegisterer:
+    """
+    models can have the following class fields:
+    list_display
+    list_filter
+    search_fields
+    raw_id_fields
+    """
+
     def __init__(self, models, ignore_models: List[Type[Model]] = None):
         self.models = models
         self.ignore_models = ignore_models

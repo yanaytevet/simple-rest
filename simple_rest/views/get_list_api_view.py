@@ -1,3 +1,4 @@
+import math
 from abc import ABC, abstractmethod
 from typing import Type
 
@@ -12,6 +13,9 @@ from ..views.api_view_component import APIViewComponent
 
 
 class GetListAPIView(APIViewComponent, ABC):
+    DEFAULT_PAGE_SIZE = 25
+    MIN_PAGE_SIZE = 10
+    MAX_PAGE_SIZE = 100
 
     @classmethod
     def get_method(cls) -> Methods:
@@ -23,9 +27,26 @@ class GetListAPIView(APIViewComponent, ABC):
     def run(self, request: APIRequest, **kwargs) -> JsonResponse:
         self.check_permitted(request, **kwargs)
         objects = self.get_model_cls().objects
-        objects = self.modify_objects_for_get(request, objects, **kwargs)
-        data = self.serialize_all_objects(request, objects, **kwargs)
-        return JsonResponse(data, status=StatusCode.HTTP_200_OK, safe=False)
+        objects = self.filter_objects_by_request(request, objects, **kwargs)
+        objects = self.order_objects_by_request(request, objects, **kwargs)
+        page = int(request.query_params.get('page', 0))
+        page_size = self.get_page_size(request)
+
+        if self.should_filter_only_by_objects():
+            total_amount = objects.count()
+            data = self.serialize_objects(request, objects, page, page_size, **kwargs)
+        else:
+            objects_list = self.filter_and_sort_list(request, objects)
+            total_amount = len(objects_list)
+            data = self.serialize_list(request, objects_list, page, page_size, **kwargs)
+        res = {
+            'total_amount': total_amount,
+            'pages_amount': math.ceil(total_amount / page_size),
+            'data': data,
+            'page': page,
+            'page_size': page_size,
+        }
+        return JsonResponse(res, status=StatusCode.HTTP_200_OK, safe=False)
 
     @classmethod
     @abstractmethod
@@ -38,16 +59,37 @@ class GetListAPIView(APIViewComponent, ABC):
         raise NotImplementedError()
 
     @classmethod
-    def modify_objects_for_get(cls, request: APIRequest, objects: QuerySet, **kwargs) -> QuerySet:
-        return objects.order_by('id')
+    def filter_objects_by_request(cls, request: APIRequest, objects: QuerySet, **kwargs) -> QuerySet:
+        return objects
 
     @classmethod
-    def serialize_all_objects(cls, request: APIRequest, query_set: QuerySet, **kwargs) -> list[JSONType]:
-        res: list[JSONType] = []
-        for obj in query_set:
-            res.append(cls.serialize_object(request, obj, **kwargs))
-        res = [obj for obj in res if obj is not None]
-        return res
+    def order_objects_by_request(cls, request: APIRequest, objects: QuerySet, **kwargs) -> QuerySet:
+        order_by_str = request.query_params.get('order_by')
+        if order_by_str:
+            objects.order_by(order_by_str)
+        return objects
+
+    @classmethod
+    def get_page_size(cls, request: APIRequest) -> int:
+        page_size = int(request.query_params.get('page_size', cls.DEFAULT_PAGE_SIZE))
+        return min(max(cls.MIN_PAGE_SIZE, page_size), cls.MAX_PAGE_SIZE)
+
+    @classmethod
+    @abstractmethod
+    def should_filter_only_by_objects(cls) -> bool:
+        raise NotImplementedError()
+
+    @classmethod
+    def serialize_objects(cls, request: APIRequest, objects: QuerySet, page: int, page_size: int, **kwargs) -> list[JSONType]:
+        start = page * page_size
+        end = (page + 1) * page_size
+        return [cls.serialize_object(request, obj, **kwargs) for obj in objects[start: end]]
+
+    @classmethod
+    def serialize_list(cls, request: APIRequest, objects_list: list[Model], page: int, page_size: int, **kwargs) -> list[JSONType]:
+        start = page * page_size
+        end = (page + 1) * page_size
+        return [cls.serialize_object(request, obj, **kwargs) for obj in objects_list[start: end]]
 
     @classmethod
     @abstractmethod
