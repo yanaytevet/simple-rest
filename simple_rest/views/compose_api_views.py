@@ -11,25 +11,27 @@ from ..exceptions.api_view_components_conflict_exception import APIViewComponent
 from ..views.api_view_component import APIViewComponent
 
 
+def get_method_func(api_view_component: APIViewComponent):
+    async def func(self, request: HttpRequest, **kwargs) -> JsonResponse:
+        api_request = APIRequest(request)
+        return api_view_component.run_with_exception_handling(api_request, **kwargs)
+    func.__name__ = str(api_view_component.get_method())
+    return func
+
+
 def compose_api_views(*api_view_components: APIViewComponent) -> Type[View]:
+    method_to_view_component: Dict[Methods, APIViewComponent] = {}
+
     @method_decorator(csrf_exempt, name='dispatch')
     class ComposedAPIView(View):
-        def __init__(self, **kwargs):
-            super().__init__(**kwargs)
-            self.method_to_view_component: Dict[Methods, APIViewComponent] = {}
-            self.set_methods()
+        pass
 
-        def set_methods(self) -> None:
-            for api_view_component in api_view_components:
-                method = api_view_component.get_method()
-                existing_api_view_component = self.method_to_view_component.get(method)
-                if existing_api_view_component is not None:
-                    raise APIViewComponentsConflictException(existing_api_view_component, method, api_view_component)
+    for api_view_component in api_view_components:
+        method = api_view_component.get_method()
+        existing_api_view_component = method_to_view_component.get(method)
+        if existing_api_view_component is not None:
+            raise APIViewComponentsConflictException(existing_api_view_component, method, api_view_component)
 
-                def func(request: HttpRequest, **kwargs) -> JsonResponse:
-                    api_request = APIRequest(request)
-                    return api_view_component.run_with_exception_handling(api_request, **kwargs)
-
-                func.__name__ = str(method)
-                setattr(self, func.__name__, func)
+        method_to_view_component[method] = api_view_component
+        setattr(ComposedAPIView, str(api_view_component.get_method()), get_method_func(api_view_component))
     return ComposedAPIView

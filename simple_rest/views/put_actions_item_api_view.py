@@ -45,23 +45,22 @@ class PutActionsItemAPIView(APIViewComponent, ABC):
     def check_permitted_after_object(cls, request: APIRequest,  obj: Model, **kwargs) -> None:
         raise NotImplementedError()
 
-    @classmethod
-    def run_action(cls, request: APIRequest, obj: Model, **kwargs) -> None:
-        if cls.ACTION_FIELD not in request.data:
+    def run_action(self, request: APIRequest, obj: Model, **kwargs) -> None:
+        if self.ACTION_FIELD not in request.data:
             raise RestAPIException(
                 status_code=StatusCode.HTTP_400_BAD_REQUEST,
                 error_code='action_field_is_missing',
                 message="'action' field is missing",
             )
-        action = request.data[cls.ACTION_FIELD]
+        action = request.data[self.ACTION_FIELD]
         action_func_name = f'put_{action}'
-        if not hasattr(cls, action_func_name):
+        if not hasattr(self, action_func_name):
             raise RestAPIException(
                 status_code=StatusCode.HTTP_400_BAD_REQUEST,
                 error_code='action_function_is_not_implemented',
                 message=f"action '{action}' is not implemented",
             )
-        getattr(cls, action_func_name)(request, obj, **kwargs)
+        getattr(self, action_func_name)(request, obj, **kwargs)
 
     @classmethod
     @abstractmethod
