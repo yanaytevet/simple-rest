@@ -6,7 +6,7 @@ from django.db.models import Model, QuerySet
 from django.http import HttpRequest, JsonResponse
 
 from ..api_request import APIRequest
-from ..common.type_hints import JSONType
+from simple_rest.utils.type_hints import JSONType
 from ..constants.methods import Methods
 from ..constants.status_code import StatusCode
 from ..views.api_view_component import APIViewComponent

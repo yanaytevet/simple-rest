@@ -8,7 +8,7 @@ from ..exceptions.none_object_doesnt_exist_api_exception import NoneObjectDoesnt
 from ..exceptions.object_doesnt_exist_api_exception import ObjectDoesntExistAPIException
 
 
-class GetItemByIdAPIMixin(ABC):
+class ItemByIdAPIMixin(ABC):
     @classmethod
     def get_object(cls, request: APIRequest, **kwargs) -> Model:
         object_id = kwargs.get('object_id')

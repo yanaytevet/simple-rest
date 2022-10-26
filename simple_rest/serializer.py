@@ -4,7 +4,7 @@ from typing import TypeVar, Generic, Optional, Any, Dict
 from asgiref.sync import sync_to_async
 from django.db.models import QuerySet
 
-from .common.type_hints import JSONType
+from simple_rest.utils.type_hints import JSONType
 
 T = TypeVar('T')
 

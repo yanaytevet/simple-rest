@@ -4,7 +4,7 @@ from django.http import HttpRequest, JsonResponse
 
 from .async_api_view_component import AsyncAPIViewComponent
 from ..async_api_request import AsyncAPIRequest
-from ..common.type_hints import JSONType
+from simple_rest.utils.type_hints import JSONType
 from ..constants.methods import Methods
 from ..constants.status_code import StatusCode
 

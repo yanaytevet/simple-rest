@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Set
 
 from django.db.models import Model
 from django.http import HttpRequest, JsonResponse
 
 from ..api_request import APIRequest
-from ..common.type_hints import JSONType
+from simple_rest.utils.type_hints import JSONType
 from ..constants.methods import Methods
 from ..constants.status_code import StatusCode
 from ..exceptions.rest_api_exception import RestAPIException

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from django.db.models import Model, QuerySet
 from django.http import HttpRequest, JsonResponse
 
-from simple_rest.common.type_hints import JSONType
+from simple_rest.utils.type_hints import JSONType
 from simple_rest.constants.methods import Methods
 from simple_rest.constants.status_code import StatusCode
 from .async_api_view_component import AsyncAPIViewComponent
