@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Type, Optional, Set
 
 from django.db.models import Model
-from django.http import HttpRequest, JsonResponse
+from django.http import HttpRequest, JsonResponse, HttpResponse
 
 from simple_rest.utils.model_utils import ModelUtils
 from simple_rest.utils.type_hints import JSONType
@@ -18,7 +18,7 @@ class AsyncPostCreateAPIView(AsyncAPIViewComponent, ABC):
     def get_method(cls) -> Methods:
         return Methods.POST
 
-    async def post(self, request: HttpRequest, **kwargs) -> JsonResponse:
+    async def post(self, request: HttpRequest, **kwargs) -> HttpResponse:
         return await self.run_with_exception_handling(AsyncAPIRequest(request), **kwargs)
 
     async def run(self, request: AsyncAPIRequest,  **kwargs) -> JsonResponse:

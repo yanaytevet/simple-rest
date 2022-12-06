@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from django.db.models import Model, QuerySet
-from django.http import HttpRequest, JsonResponse
+from django.http import HttpRequest, JsonResponse, HttpResponse
 
 from simple_rest.utils.type_hints import JSONType
 from simple_rest.constants.methods import Methods
@@ -16,7 +16,7 @@ class AsyncGetItemAPIView(AsyncAPIViewComponent, ABC):
     def get_method(cls) -> Methods:
         return Methods.GET
 
-    async def get(self, request: HttpRequest, **kwargs) -> JsonResponse:
+    async def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
         return await self.run_with_exception_handling(AsyncAPIRequest(request), **kwargs)
 
     async def run(self, request: AsyncAPIRequest, **kwargs) -> JsonResponse:

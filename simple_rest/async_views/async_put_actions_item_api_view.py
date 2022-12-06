@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 from asgiref.sync import sync_to_async
 from django.db.models import Model
-from django.http import HttpRequest, JsonResponse
+from django.http import HttpRequest, JsonResponse, HttpResponse
 
 from .async_api_view_component import AsyncAPIViewComponent
 from ..async_api_request import AsyncAPIRequest
@@ -20,7 +20,7 @@ class AsyncPutActionsItemAPIView(AsyncAPIViewComponent, ABC):
     def get_method(cls) -> Methods:
         return Methods.PUT
 
-    async def put(self, request: HttpRequest, **kwargs) -> JsonResponse:
+    async def put(self, request: HttpRequest, **kwargs) -> HttpResponse:
         return await self.run_with_exception_handling(AsyncAPIRequest(request), **kwargs)
 
     async def run(self, request: AsyncAPIRequest, **kwargs) -> JsonResponse:

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from django.http import HttpRequest, JsonResponse
+from django.http import HttpRequest, JsonResponse, HttpResponse
 
 from .async_api_view_component import AsyncAPIViewComponent
 from ..async_api_request import AsyncAPIRequest
@@ -15,7 +15,7 @@ class AsyncSimplePostAPIView(AsyncAPIViewComponent, ABC):
     def get_method(cls) -> Methods:
         return Methods.POST
 
-    async def post(self, request: HttpRequest, **kwargs) -> JsonResponse:
+    async def post(self, request: HttpRequest, **kwargs) -> HttpResponse:
         return await self.run_with_exception_handling(AsyncAPIRequest(request), **kwargs)
 
     async def run(self, request: AsyncAPIRequest, **kwargs) -> JsonResponse:

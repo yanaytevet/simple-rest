@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
@@ -18,10 +18,10 @@ class AsyncAPIViewComponent(View, ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def run(self, request: AsyncAPIRequest, **kwargs) -> JsonResponse:
+    async def run(self, request: AsyncAPIRequest, **kwargs) -> HttpResponse:
         raise NotImplementedError()
 
-    async def run_with_exception_handling(self, request: AsyncAPIRequest, **kwargs) -> JsonResponse:
+    async def run_with_exception_handling(self, request: AsyncAPIRequest, **kwargs) -> HttpResponse:
         try:
             return await self.run(request, **kwargs)
         except RestAPIException as e:

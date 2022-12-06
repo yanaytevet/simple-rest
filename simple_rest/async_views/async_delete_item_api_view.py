@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from asgiref.sync import sync_to_async
 from django.db.models import Model, QuerySet
-from django.http import JsonResponse, HttpRequest
+from django.http import JsonResponse, HttpRequest, HttpResponse
 
 from .async_api_view_component import AsyncAPIViewComponent
 from ..async_api_request import AsyncAPIRequest
@@ -16,7 +16,7 @@ class AsyncDeleteItemAPIView(AsyncAPIViewComponent, ABC):
     def get_method(cls) -> Methods:
         return Methods.DELETE
 
-    async def delete(self, request: HttpRequest, **kwargs) -> JsonResponse:
+    async def delete(self, request: HttpRequest, **kwargs) -> HttpResponse:
         return await self.run_with_exception_handling(AsyncAPIRequest(request), **kwargs)
 
     async def run(self, request: AsyncAPIRequest, **kwargs) -> JsonResponse:

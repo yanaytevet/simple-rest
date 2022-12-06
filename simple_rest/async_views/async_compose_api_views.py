@@ -1,6 +1,6 @@
 from typing import Dict, Type
 
-from django.http import HttpRequest, JsonResponse
+from django.http import HttpRequest, JsonResponse, HttpResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
@@ -12,7 +12,7 @@ from ..exceptions.api_view_components_conflict_exception import APIViewComponent
 
 
 def get_method_async_func(api_view_component: AsyncAPIViewComponent):
-    async def func(self, request: HttpRequest, **kwargs) -> JsonResponse:
+    async def func(self, request: HttpRequest, **kwargs) -> HttpResponse:
         api_request = AsyncAPIRequest(request)
         return await api_view_component.run_with_exception_handling(api_request, **kwargs)
     func.__name__ = str(api_view_component.get_method())

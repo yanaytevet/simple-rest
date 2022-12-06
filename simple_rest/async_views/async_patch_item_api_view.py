@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Set
 
 from django.db.models import Model, QuerySet
-from django.http import HttpRequest, JsonResponse
+from django.http import HttpRequest, JsonResponse, HttpResponse
 
 from .async_api_view_component import AsyncAPIViewComponent
 from ..async_api_request import AsyncAPIRequest
@@ -18,7 +18,7 @@ class AsyncPatchItemAPIView(AsyncAPIViewComponent, ABC):
     def get_method(cls) -> Methods:
         return Methods.PATCH
 
-    async def patch(self, request: HttpRequest, **kwargs) -> JsonResponse:
+    async def patch(self, request: HttpRequest, **kwargs) -> HttpResponse:
         return await self.run_with_exception_handling(AsyncAPIRequest(request), **kwargs)
 
     async def run(self, request: AsyncAPIRequest, **kwargs) -> JsonResponse:
@@ -46,7 +46,6 @@ class AsyncPatchItemAPIView(AsyncAPIViewComponent, ABC):
         raise NotImplementedError()
 
     @classmethod
-    @abstractmethod
     async def update_item(cls, request: AsyncAPIRequest,  obj: Model, **kwargs) -> None:
         data = await cls.get_modified_request_data_for_editing(request, obj)
         await ModelUtils.async_update_from_json(obj, data, cls.get_allowed_edit_fields())
