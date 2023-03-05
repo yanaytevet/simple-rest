@@ -1,3 +1,4 @@
+import json
 import math
 from abc import ABC, abstractmethod
 from typing import Type
@@ -6,6 +7,7 @@ from django.db.models import Model, QuerySet
 from django.http import HttpRequest, JsonResponse, HttpResponse
 
 from .async_api_view_component import AsyncAPIViewComponent
+from ..api_request import APIRequest
 from ..async_api_request import AsyncAPIRequest
 from simple_rest.utils.type_hints import JSONType
 from ..constants.methods import Methods
@@ -97,3 +99,10 @@ class AsyncGetListAPIView(AsyncAPIViewComponent, ABC):
     @abstractmethod
     async def serialize_object(cls, request: AsyncAPIRequest, obj: Model, **kwargs) -> JSONType:
         raise NotImplementedError()
+
+    @classmethod
+    def get_filter_params_from_request(cls, request: APIRequest) -> JSONType:
+        filter_params_str = request.query_params.get('filter_params')
+        if not filter_params_str:
+            return {}
+        return json.loads(filter_params_str)
